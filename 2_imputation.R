@@ -125,99 +125,99 @@ summarise_all(~sum(as.integer(is.na(.)))) %>%
 collect()
 print(na_per_col)
 
-## Compare imputation method for cases where bmi label could be used vs lm
-#df_bmi_label <- df %>%
-#  filter(!is.na(bmi) & !is.na(bmi_cat)) %>%
-#  count() %>%
-#  collect()
+# Compare imputation method for cases where bmi label could be used vs lm
+df_bmi_label <- df %>%
+ filter(!is.na(bmi) & !is.na(bmi_cat)) %>%
+ count() %>%
+ collect()
 
 
-#df_bmi_label %>%
-#head(10) %>%
-#collect() %>%
-#print()
+df_bmi_label %>%
+head(10) %>%
+collect() %>%
+print()
 
-#partitions <- sdf_partition(df_bmi_label, training = 0.7, test = 0.3)
-#df_bmi_label_train <- partitions$training
-#df_bmi_label_test <- partitions$test
-#
-#fit_male <- df_bmi_label_train %>%
-#filter(sex == 1) %>%
-#mutate(age2 = age^2,
-#      age3 = age^3) %>%
-#select(-chemocat,
-#      -ethnicity,
-#      -homecat,
-#      -learncat,
-#      -renalcat,
-#      -bmi_cat,
-#      -nhs_number,
-#      -census_person_id,
-#      -linked_gpes,
-#      -p_marrow6_gpes) %>%
-#ml_linear_regression(., bmi ~ . + sex:age + age:.)
-#
-#fit_female <- df_bmi_label_train %>%
-#filter(sex == 0) %>%
-#mutate(age2 = age^2,
-#      age3 = age^3) %>%
-#select(-chemocat,
-#      -ethnicity,
-#      -homecat,
-#      -learncat,
-#      -renalcat,
-#      -bmi_cat,
-#      -nhs_number,
-#      -census_person_id,
-#      -linked_gpes,
-#      -p_marrow6_gpes) %>%
-#ml_linear_regression(., bmi ~ . + sex:age + age:.)
-#
-#summary(fit_male)
-#summary(fit_female)
-#
-#pred_male <- df_bmi_label_test %>%
-#filter(sex == 1) %>%
-#mutate(age2 = age^2,
-#      age3 = age^3) %>%
-#ml_predict(fit_male, .) %>%
-#rename(prediction_lm_male = prediction)
-#
-#pred_female <- df_bmi_label_test %>%
-#filter(sex == 0) %>%
-#mutate(age2 = age^2,
-#      age3 = age^3) %>%
-#ml_predict(fit_female, .) %>%
-#rename(prediction_lm_female = prediction)
-#
-## pred %>% head(10) %>% collect() %>% print()
-#
-#df_bmi_label_test <- df_bmi_label_test %>%
-#left_join(., pred_male) %>%
-#left_join(., pred_female)
-#
-#df_bmi_label_test <- df_bmi_label_test %>%
-#mutate(prediction_lm = prediction_lm_male) %>%
-#mutate(prediction_lm = ifelse(is.na(prediction_lm),
-#                              prediction_lm_female,
-#                              prediction_lm))
-#
-#mean_bmi_by_label <- df_bmi_label_train %>%
-#group_by(bmi_cat, sex) %>%
-#summarise(prediction_mm = mean(bmi))
-#
-#df_bmi_label_test <- df_bmi_label_test %>%
-#left_join(., mean_bmi_by_label, by = c("bmi_cat", "sex"))
-#
-## df_bmi_label_test %>% head(10) %>% collect() %>% print()
-#
-#mse <- df_bmi_label_test %>%
-#mutate(se_lm = (bmi - prediction_lm)^2,
-#      se_mm = (bmi - prediction_mm)^2) %>%
-#summarise(mse_lm = mean(se_lm), mse_mm = mean(se_mm))
-#
-#mse %>% collect() %>% print()
-#
+partitions <- sdf_partition(df_bmi_label, training = 0.7, test = 0.3)
+df_bmi_label_train <- partitions$training
+df_bmi_label_test <- partitions$test
+
+fit_male <- df_bmi_label_train %>%
+filter(sex == 1) %>%
+mutate(age2 = age^2,
+     age3 = age^3) %>%
+select(-chemocat,
+     -ethnicity,
+     -homecat,
+     -learncat,
+     -renalcat,
+     -bmi_cat,
+     -nhs_number,
+     -census_person_id,
+     -linked_gpes,
+     -p_marrow6_gpes) %>%
+ml_linear_regression(., bmi ~ . + sex:age + age:.)
+
+fit_female <- df_bmi_label_train %>%
+filter(sex == 0) %>%
+mutate(age2 = age^2,
+     age3 = age^3) %>%
+select(-chemocat,
+     -ethnicity,
+     -homecat,
+     -learncat,
+     -renalcat,
+     -bmi_cat,
+     -nhs_number,
+     -census_person_id,
+     -linked_gpes,
+     -p_marrow6_gpes) %>%
+ml_linear_regression(., bmi ~ . + sex:age + age:.)
+
+summary(fit_male)
+summary(fit_female)
+
+pred_male <- df_bmi_label_test %>%
+filter(sex == 1) %>%
+mutate(age2 = age^2,
+     age3 = age^3) %>%
+ml_predict(fit_male, .) %>%
+rename(prediction_lm_male = prediction)
+
+pred_female <- df_bmi_label_test %>%
+filter(sex == 0) %>%
+mutate(age2 = age^2,
+     age3 = age^3) %>%
+ml_predict(fit_female, .) %>%
+rename(prediction_lm_female = prediction)
+
+# pred %>% head(10) %>% collect() %>% print()
+
+df_bmi_label_test <- df_bmi_label_test %>%
+left_join(., pred_male) %>%
+left_join(., pred_female)
+
+df_bmi_label_test <- df_bmi_label_test %>%
+mutate(prediction_lm = prediction_lm_male) %>%
+mutate(prediction_lm = ifelse(is.na(prediction_lm),
+                             prediction_lm_female,
+                             prediction_lm))
+
+mean_bmi_by_label <- df_bmi_label_train %>%
+group_by(bmi_cat, sex) %>%
+summarise(prediction_mm = mean(bmi))
+
+df_bmi_label_test <- df_bmi_label_test %>%
+left_join(., mean_bmi_by_label, by = c("bmi_cat", "sex"))
+
+# df_bmi_label_test %>% head(10) %>% collect() %>% print()
+
+mse <- df_bmi_label_test %>%
+mutate(se_lm = (bmi - prediction_lm)^2,
+     se_mm = (bmi - prediction_mm)^2) %>%
+summarise(mse_lm = mean(se_lm), mse_mm = mean(se_mm))
+
+mse %>% collect() %>% print()
+
 # As MSE of means of bmi_cat is lower, firstly impute
 # missing bmi where bmi_cat is present
 
@@ -235,10 +235,10 @@ select(-prediction_mm)
 
 #
 #### Missingness again
-#na_per_col <- df %>%
-#summarise_all(~sum(as.integer(is.na(.)))) %>%
-#collect()
-#print(na_per_col)
+na_per_col <- df %>%
+summarise_all(~sum(as.integer(is.na(.)))) %>%
+collect()
+print(na_per_col)
 
 # Linear regression of BMI on all vars
 bmi_fit_male <- df %>%
@@ -304,29 +304,29 @@ select(-age2,
       -age3)
 
 # Compare summary stats of actual vs predicted bmi
-#df %>%
-#filter(!is.na(bmi) & sex == 1) %>%
-#select(bmi) %>%
-#sdf_describe() %>%
-#print()
-#
-#predicted_bmi_male %>%
-#select(bmi) %>%
-#sdf_describe() %>%
-#print()
-#
-#df %>%
-#filter(!is.na(bmi) & sex == 0) %>%
-#select(bmi) %>%
-#sdf_describe() %>%
-#print()
-#
-#predicted_bmi_female %>%
-#select(bmi) %>%
-#sdf_describe() %>%
-#print()
-#
-## Combine the data
+df %>%
+filter(!is.na(bmi) & sex == 1) %>%
+select(bmi) %>%
+sdf_describe() %>%
+print()
+
+predicted_bmi_male %>%
+select(bmi) %>%
+sdf_describe() %>%
+print()
+
+df %>%
+filter(!is.na(bmi) & sex == 0) %>%
+select(bmi) %>%
+sdf_describe() %>%
+print()
+
+predicted_bmi_female %>%
+select(bmi) %>%
+sdf_describe() %>%
+print()
+
+# Combine the data
 df_complete_cases <- df %>%
 filter(!is.na(bmi))
 
@@ -334,30 +334,24 @@ df <- sdf_bind_rows(df_complete_cases, predicted_bmi_male) %>%
 sdf_bind_rows(., predicted_bmi_female)
 #
 ## Look at the data
-#df %>%
-#head(10) %>%
-#collect() %>%
-#print()
-#
-## Dimensions again
-#n_row_new <- df %>% sdf_nrow()
-#n_row_new
-#n_row
-#
-#n_col_new <- df %>% sdf_ncol()
-#n_col_new
-#
+df %>%
+head(10) %>%
+collect() %>%
+print()
+
+# Dimensions again
+n_row_new <- df %>% sdf_nrow()
+n_row_new
+n_row
+
+n_col_new <- df %>% sdf_ncol()
+n_col_new
+
 ## Missingness again
 na_per_col_new <- df %>%
 summarise_all(~sum(as.integer(is.na(.)))) %>%
 collect()
 print(na_per_col_new)
-
-#df %>%
-#mutate(na_bmi = ifelse(is.na(bmi),1,0))%>%
-#summarise(sum(na_bmi))%>%
-#collect()
-
 
 # Delete table
 sql <- paste0('DROP TABLE IF EXISTS q_cov_valid.linked_census_qcovid_bmi_imp_pp')
