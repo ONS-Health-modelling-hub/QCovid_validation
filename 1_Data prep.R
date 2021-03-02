@@ -5,7 +5,7 @@ library(tidyverse)
 
 eos_date = "2020-07-28"
 dir ="cen_dth_hes/QCOVID validation"
-keyworker_lookup_file = "Ethnicity model for October 2020 publication/KEYWORKER_LOOKUP_TABLE.csv"
+keyworker_lookup_file = "KEYWORKER_LOOKUP_TABLE.csv"
 
 
 ########################
@@ -372,13 +372,7 @@ linkage_info <-  sdf_sql(sc, "SELECT * FROM  cen_dth_hes.cenmortlink_gpes_202011
 linkage_pr <-  sdf_sql(sc, "SELECT * FROM  cen_dth_hes.cenmortlink_20201116") %>%
                  select(census_person_id,pr_link)
 
-linkage_pr %>%
-group_by(pr_link)%>%
-count()%>%
-collect()
-linkage_info <- linkage_info%>%
-  left_join(linkage_pr, by="census_person_id")%>%
-mutate( pr_link  = if_else(is.na(pr_link ), 0, pr_link  ))
+
 #### ------------------####
 #### Link all the data ####
 #### ------------------####
@@ -505,40 +499,3 @@ sdf_register(linked_data, 'linked_data')
 sql <- paste0('CREATE TABLE q_cov_valid.linked_census_qcovid AS SELECT * FROM linked_data')
 DBI::dbExecute(sc, sql)
 
-####### test ######
-
-
-linked_data<- sdf_sql(sc, "SELECT * FROM  q_cov_valid.linked_census_qcovid")
-df_sample <-  linked_data %>%
-         sdf_sample(fraction=0.0001,
-                         seed=11235, replacement=FALSE) %>%
-       collect()
-print(df_sample )
-
-
-####### QA ########
-
-linked_data<- sdf_sql(sc, "SELECT * FROM  q_cov_valid.linked_census_qcovid")
-
-linkage_desc <- linked_data %>%
-              group_by()
-
-## add flags for non-linkage
-linkage_info <-  sdf_sql(sc, "SELECT * FROM  cen_dth_hes.cenmortlink_20201116")%>%
-         sdf_sample(fraction=0.0001,
-                         seed=11235, replacement=FALSE) %>%
-       collect()
-
-
-%>%
-           select(census_person_id, gpes_nhsno) %>%
-           mutate(linked_gpes = as.numeric(!is.na(gpes_nhsno)))%>%
-           select(-gpes_nhsno)
-                 #unlinked_pr =ifelse(pr_link == 1, 1, 0))
-
-
-linkage_pr <-  sdf_sql(sc, "SELECT * FROM  cen_dth_hes.cenmortlink_20200914")
-linkage_pr %>%
-group_by(pr_link)%>%
-count()%>%
-collect()
