@@ -3,25 +3,10 @@ library(dplyr)
 library(sparklyr)
 library(tidyverse)
 
-eos_date = "2020-07-28"
-dir ="cen_dth_hes/QCOVID validation"
-keyworker_lookup_file = "KEYWORKER_LOOKUP_TABLE.csv"
-
 
 ########################
 #Set up the spark connection
 #########################
-
-config <- spark_config() 
-config$spark.dynamicAllocation.maxExecutors <- 30
-config$spark.executor.cores <- 5
-config$spark.executor.memory <- "20g"
-config$spark.driver.maxResultSize <- "10g"
-sc <- spark_connect(master = "yarn-client",
-                    app_name = "R_Example",
-                    config = config,
-                    version = "2.3.0")
-
 
 
 ###############
