@@ -1,7 +1,6 @@
 library(tidyverse)
 library(extrafont)
 loadfonts()
-path <- '/home/cdsw/Results'
 
 if (!file.exists(path)){
   dir.create(path)
