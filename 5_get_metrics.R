@@ -5,9 +5,7 @@ library(sparklyr)
 library(survival)
 
 ########################
-# Functions
-source('/home/cdsw/q_covid_valid/_functions.R')
-path <- '/home/cdsw/Results'
+
 
 ## function to get the metrics
 get_metrics <- function(df, samp=0.02){
