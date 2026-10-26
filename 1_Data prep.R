@@ -13,7 +13,7 @@ library(tidyverse)
 #Get data frames
 ###############
 
-tbl_change_db(sc, "cen_dth_hes")
+
 
 
 ## create connection to main analytical dataset
