@@ -7,15 +7,6 @@ library(tidyverse)
 #Set up the spark connection
 #########################
 
-config <- spark_config() 
-config$spark.dynamicAllocation.maxExecutors <- 30
-config$spark.executor.cores <- 5
-config$spark.executor.memory <- "20g"
-config$spark.driver.maxResultSize <- "10g"
-sc <- spark_connect(master = "yarn-client",
-                    app_name = "q_cov_val_pp",
-                    config = config,
-                    version = "2.3.0")
 # Check config
 spark_config(sc)
 
@@ -27,8 +18,8 @@ spark_connection_is_open(sc)
 ###############
 
 # To find what tables are in the database
-tbl_change_db(sc, "q_cov_valid")
-#src_tbls(sc)
+
+
 
 # Create connection to main analytical dataset
 df <- sdf_sql(sc, "SELECT * FROM  linked_census_qcovid")
