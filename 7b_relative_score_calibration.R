@@ -5,25 +5,6 @@ library(extrafont)
 loadfonts()
 
 ########################
-# Functions
-source('/home/cdsw/q_covid_valid/_functions.R')
-path <- '/home/cdsw/Results'
-
-
-########################
-#Set up the spark connection
-#########################
-
-config <- spark_config() 
-config$spark.dynamicAllocation.maxExecutors <- 30
-config$spark.executor.cores <- 5
-config$spark.executor.memory <- "20g"
-config$spark.driver.maxResultSize <- "10g"
-sc <- spark_connect(master = "yarn-client",
-                    app_name = "R_Example",
-                    config = config,
-                    version = "2.3.0")
-
 
 #### Period 1 ####
 
